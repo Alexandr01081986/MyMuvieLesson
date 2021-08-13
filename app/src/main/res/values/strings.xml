@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">MyMuvieLesson</string>
     <string name="sing_in">Sing In</string>
+    <string name="views">Views</string>
+    <string name="selection">Selection</string>
+    <string name="description">Description</string>
+    <string name="login_and_password">Login and password</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="muvie">Muvie</string>
 </resources>
