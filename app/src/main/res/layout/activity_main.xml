@@ -1,59 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/text_size_1"
-    tools:context=".MainActivity">
+    android:orientation="vertical">
 
-    <Button
-        android:id="@+id/button"
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="button" />
+        android:layout_gravity="bottom">
 
-    <TextView
-        android:id="@+id/film_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/cardview_dark_background"
-        android:textSize="@dimen/text_size_1" />
+        <ToggleButton
+            android:id="@+id/btnHome"
+            style="@style/btn_main_menu"
+            android:layout_gravity="start"
+            android:background="@drawable/ic_baseline_home_20"
+            android:checked="true" />
 
-    <TextView
-        android:id="@+id/film_genre"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/cardview_dark_background"
-        android:textSize="@dimen/text_size_1" />
+        <ToggleButton
+            android:id="@+id/btnFavorite"
+            style="@style/btn_main_menu"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_baseline_star_border_20_off"
+            android:checked="false" />
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="15dp"
-        android:background="?android:attr/listDivider" />
+        <ToggleButton
+            android:id="@+id/btnRating"
+            style="@style/btn_main_menu"
+            android:layout_gravity="end"
+            android:background="@drawable/ic_baseline_graphic_eq_20_off"
+            android:checked="false" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/text_size_1"
-        android:textColor="@color/cardview_dark_background"
-        android:text="@string/muvie"
-        android:layout_gravity="center" />
-
-    <TextView
-        android:id="@+id/film_title2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/cardview_dark_background"
-        android:textSize="@dimen/text_size_1" />
-
-    <TextView
-        android:id="@+id/film_genre2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/cardview_dark_background"
-        android:textSize="@dimen/text_size_1" />
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </LinearLayout>
