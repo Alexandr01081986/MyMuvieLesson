@@ -1,6 +1,6 @@
 package com.example.mymuvielesson.ui.main.view
 
-
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,11 +16,11 @@ import com.example.mymuvielesson.databinding.FragmentMainBinding
 import com.example.mymuvielesson.ui.main.model.Muvie
 import com.example.mymuvielesson.ui.main.viewmodel.AppState
 import com.example.mymuvielesson.ui.main.viewmodel.MainViewModel
-import com.google.android.material.snackbar.Snackbar
 
 class MainFragment : Fragment() {
 
     companion object {
+        const val NUM_COLUMN = 2
         fun newInstance() = MainFragment()
     }
 
@@ -38,8 +38,6 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
-        isLandscape = resources.configuration.orientation ==
-                android.content.res.Configuration.ORIENTATION_LANDSCAPE
         return binding.root
     }
 
@@ -52,9 +50,13 @@ class MainFragment : Fragment() {
 
     private fun initRecycler() {
 
-        if (isLandscape) {
-            binding.recyclerPlaying.layoutManager = GridLayoutManager(context, 2)
-            binding.recyclerUpcoming.layoutManager = GridLayoutManager(context, 2)
+        isLandscape = when (resources.configuration.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> {
+                binding.recyclerPlaying.layoutManager = GridLayoutManager(context, NUM_COLUMN)
+                binding.recyclerUpcoming.layoutManager = GridLayoutManager(context, NUM_COLUMN)
+                true
+            }
+            else -> false
         }
         binding.recyclerPlaying.adapter = adapterPlayNow
         binding.recyclerUpcoming.adapter = adapterUpcoming
@@ -78,48 +80,54 @@ class MainFragment : Fragment() {
         viewModel.getDataFromLocalSource()
     }
 
-    private fun renderData(appState: AppState) {
+    private fun renderData(appState: AppState) = with(binding){
 
-        val loadingLayout = binding.loadingLayout
-        val mainView = binding.mainView
         when (appState) {
             is AppState.Success -> {
                 val movieDataPlay = appState.movieDataPlay
                 val movieDataCome = appState.movieDataCome
-                loadingLayout.visibility = View.GONE
-                adapterPlayNow.setData(movieDataPlay)
-                adapterUpcoming.setData(movieDataCome)
-                adapterPlayNow.setOnItemClickListener { openScreen(it) }
-                adapterUpcoming.setOnItemClickListener { openScreen(it) }
-            }
-            is AppState.Loading -> {
-                loadingLayout.visibility = View.VISIBLE
-            }
-            is AppState.Error -> {
-                loadingLayout.visibility = View.GONE
-                Snackbar
-                    .make(mainView, "Error", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Reload") { viewModel.getDataFromLocalSource() }
-                    .show()
+                loadingLayout.hideIf {true}
+                adapterPlayNow.also {
+                    it.movieData = movieDataPlay
+                    it.notifyDataSetChanged()
+                }
+                adapterUpcoming.also {
+                    it.movieData = movieDataCome
+                    it.notifyDataSetChanged()
+                }
+
+                adapterPlayNow.setOnItemClickListener{openScreen(it)}
+                adapterUpcoming.setOnItemClickListener {openScreen(it)}
+                }
+                is AppState.Loading -> {
+                    loadingLayout.showIf {true}
+                }
+                is AppState.Error -> {
+                    loadingLayout.hideIf {true}
+                    mainView.showSnackBar(getString(R.string.error)
+                        ,getString(R.string.reload)
+                        ,{viewModel.getDataFromLocalSource()})
+                    mainView.hideKeyboard()
+                }
             }
         }
-    }
 
-    private fun openScreen(movie: Muvie) {
-        val manager = activity?.supportFragmentManager
-        if (manager != null) {
-            val bundle = Bundle()
-            bundle.putParcelable(DetailsFragment.BUNDLE_EXTRA, movie)
-            manager.beginTransaction()
-                .replace(R.id.container, DetailsFragment.newInstance(bundle))
-                .addToBackStack("")
-                .commitAllowingStateLoss()
+        private fun openScreen(movie: Muvie) {
+            val manager = activity?.supportFragmentManager
+            manager?.let {
+                manager.beginTransaction()
+                    .replace(R.id.container, DetailsFragment.newInstance(Bundle()
+                        .apply {
+                        putParcelable(DetailsFragment.BUNDLE_EXTRA, movie)
+                    }))
+                    .addToBackStack("")
+                    .commitAllowingStateLoss()
+            }
         }
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        adapterPlayNow.removeListener()
-    }
+        override fun onDestroyView() {
+            super.onDestroyView()
+            _binding = null
+            adapterPlayNow.removeListener()
+        }
 }

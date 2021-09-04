@@ -18,10 +18,11 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
         initButtons()
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(binding.container.id, MainFragment.newInstance())
-                .commitNow()
+        when (savedInstanceState) {
+            null ->
+                supportFragmentManager.beginTransaction()
+                    .replace(binding.container.id, MainFragment.newInstance())
+                    .commitNow()
         }
     }
 

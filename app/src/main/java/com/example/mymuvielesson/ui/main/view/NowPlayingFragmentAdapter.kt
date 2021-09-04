@@ -5,19 +5,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mymuvielesson.R
 import com.example.mymuvielesson.ui.main.model.Muvie
 
 class NowPlayingFragmentAdapter : RecyclerView.Adapter<NowPlayingFragmentAdapter.ViewHolder>() {
 
-    private var movieData: List<Muvie> = emptyList()
-    private var itemClickListener: OnItemClickListener? = null
+    internal var movieData: List<Muvie> = emptyList()
 
-    fun setData(data: List<Muvie>) {
-        movieData = data
-        notifyDataSetChanged()
-    }
+    private var onSomeItemClickListener: ((Muvie) -> Unit)? = null
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -37,25 +34,28 @@ class NowPlayingFragmentAdapter : RecyclerView.Adapter<NowPlayingFragmentAdapter
         return movieData.size
     }
 
-    fun interface OnItemClickListener {
-        fun onItemClick(movie: Muvie)
-    }
+    fun setOnItemClickListener(onSomeItemClickListener: (Muvie) -> Unit) {
+        this.onSomeItemClickListener = onSomeItemClickListener
 
-    fun setOnItemClickListener(itemClickListener: OnItemClickListener) {
-        this.itemClickListener = itemClickListener
-    }
+        fun removeListener() {
+            onSomeItemClickListener = null
+        }
 
-    fun removeListener() {
-        itemClickListener = null
-    }
-
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        fun bind(movie: Muvie) {
-            itemView.findViewById<TextView>(R.id.title_play).text = movie.name
-            itemView.findViewById<TextView>(R.id.rating).text = movie.rating
-            itemView.findViewById<TextView>(R.id.date_play).text = movie.releaseDate.toString()
-            itemView.findViewById<AppCompatImageView>(R.id.image_view_play).setOnClickListener {
-                itemClickListener?.onItemClick(movie)
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            fun bind(movie: Muvie) {
+                itemView.apply {
+                    findViewById<TextView>(R.id.title_play).text = movie.name
+                    findViewById<TextView>(R.id.rating).text = movie.rating
+                    findViewById<TextView>(R.id.date_play).text = movie.releaseDate.format()
+                    findViewById<CardView>(R.id.card_play).setOnClickListener {
+                        onSomeItemClickListener?.invoke(movie)
+                    }
+                    val imageMovie = findViewById<AppCompatImageView>(R.id.image_view_play)
+                    imageMovie.createImageFromResource()
+                    imageMovie.setOnClickListener {
+                        onSomeItemClickListener?.invoke(movie)
+                    }
+                }
             }
         }
     }

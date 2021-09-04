@@ -32,21 +32,23 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val muvie = arguments?.getParcelable<Muvie>(BUNDLE_EXTRA)
+        arguments?.getParcelable<Muvie>(BUNDLE_EXTRA)?.let { initView(it) }
+    }
 
-        muvie?.let {
-            binding.titleRus.text = muvie.name
-            binding.titleOriginal.text = muvie.nameOrigin
-            binding.genre.text = muvie.genre
-            binding.duration.text = muvie.duration
-            binding.ratingDetail.text = muvie.rating
-            binding.revenue.text = muvie.revenue
-            binding.description.text = muvie.description
-            binding.dateRelease.text = muvie.releaseDate.toString()
-            binding.btnFavorite.setBackgroundResource(
+    private fun initView(muvie: Muvie) {
+        with(binding) {
+            titleRus.text = muvie.name
+            titleOriginal.text = muvie.nameOrigin
+            genre.text = muvie.genre
+            duration.apply { text = muvie.duration }.hideIf { muvie.duration == "" }
+            ratingDetail.text = muvie.rating
+            revenue.apply { text = muvie.revenue }.showIf { muvie.revenue != "" }
+            description.text = muvie.description
+            dateRelease.text = muvie.releaseDate.format()
+            btnFavorite.setBackgroundResource(
                 changeBackButton(muvie.favorite)
             )
-            binding.btnFavorite.setOnClickListener {
+            btnFavorite.setOnClickListener {
                 val favorite = !muvie.favorite
                 binding.btnFavorite.setBackgroundResource(changeBackButton(favorite))
                 muvie.favorite = favorite
